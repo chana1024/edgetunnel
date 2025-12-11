@@ -125,29 +125,60 @@
 | URL | `https://blog.cmliussss.com` |❌| 主页反代伪装(乱设容易触发反诈，反代被墙的网站会加速域名被墙) |
 | GO2SOCKS5  | `blog.cmliussss.com`,`*.ip111.cn`,`*google.com` |❌| 设置`SOCKS5`或`HTTP`变量之后，可设置强制使用socks5访问名单(设置为`*`可作为全局代理) |
 
-## 🔧 实用技巧
-该项目部署的节点可通过节点PATH(路径)的方式，使用指定的`PROXYIP`或`SOCKS5`！！！**
+## 核心概念与订阅配置指南
 
-- 指定 `PROXYIP` 案例
-   ```url
-   /proxyip=proxyip.cmliussss.net
-   /?proxyip=proxyip.cmliussss.net
-   /proxyip.cmliussss.net (仅限于域名开头为'proxyip.'的域名)
-   ```
+### 1. 项目概述
 
-- 指定 `SOCKS5` 案例
-   ```url
-   /socks5=user:password@127.0.0.1:1080
-   /?socks5=user:password@127.0.0.1:1080
-   /socks://dXNlcjpwYXNzd29yZA==@127.0.0.1:1080 (默认激活全局SOCKS5)
-   /socks5://user:password@127.0.0.1:1080 (默认激活全局SOCKS5)
-   ```
+本项目是一个部署在 Cloudflare 上的 Worker，它作为一个高度可配置的代理和订阅生成器。其核心功能是动态生成适用于Clash、Sing-Box等客户端的代理节点信息，并能利用Cloudflare网络特性优化连接。
 
-- 指定 `HTTP代理` 案例
-   ```url
-   /http=user:password@127.0.0.1:1080
-   /http://user:password@127.0.0.1:8080 (默认激活全局SOCKS5)
-   ```
+### 2. 核心概念
+
+#### 2.1 访问端点
+
+- **域名访问**: Worker没有固定的IP地址。您应当通过其域名（例如 `your-worker-name.your-account.workers.dev` 或您绑定的自定义域名）来访问。Cloudflare的全球网络会自动将您的请求路由到最近的数据中心。
+- **客户端配置**: 在Clash等客户端中，服务器地址(`server`)应填写Worker的**域名**。
+
+#### 2.2 代理链 (`PROXYIP`)
+
+- `PROXYIP` 是一个可选的上游代理服务器（IP或域名）。
+- 当设置了`PROXYIP`时，Worker会将收到的流量再次转发到这个上游代理，从而形成代理链。
+- 可以在环境变量中设置一个全局默认值，也可以在每次请求的URL中动态指定。
+
+### 3. 订阅生成机制
+
+当您访问订阅地址（如 `/sub?token=...`）时，Worker会实时生成订阅内容。其中，节点IP的来源是核心，主要通过以下三种方式配置，由管理后台`config.json`中的 `优选订阅生成.本地IP库.随机IP` 选项控制。
+
+---
+
+#### **方式A：动态随机生成 (默认)**
+
+- **配置**: `随机IP` 设置为 `true`。
+- **行为**: 这是默认的工作方式。Worker会根据您访问时所在的网络运营商（ASN），从Cloudflare官方IP段中实时随机生成一批IP地址。
+- **优点**: 自动化，无需维护，能动态适应不同网络环境，寻找最优连接。
+- **注意**: 在此模式下，`ADD.txt` 文件中的内容会被忽略。
+
+---
+
+#### **方式B：使用自定义IP列表**
+
+- **配置**: `随机IP` 设置为 `false`。
+- **行为**: Worker会去读取您在管理后台 `ADD.txt` 文件中保存的IP列表，并使用这些IP来生成节点。
+- **优点**: 完全可控，您可以使用自己筛选的、认为最稳定的IP地址。
+- **回退机制**: 如果 `ADD.txt` 为空，Worker会自动回退到**方式A**。
+- **如何设置**:
+    1.  在管理后台将 `随机IP` 设置为 `false`。
+    2.  在 `ADD.txt` 编辑框中，填入您自己的IP地址列表（每行一个）。
+
+---
+
+#### **方式C：调用外部API获取IP**
+
+- **配置**: `随机IP` 设置为 `false`。
+- **行为**: 这是方式B的扩展。您可以在 `ADD.txt` 文件中填入一个或多个API的URL地址。Worker在读取 `ADD.txt` 时，会自动请求这些URL，获取返回的文本内容作为IP列表，并与 `ADD.txt` 中其他的IP地址合并后使用。
+- **优点**: 高度灵活和自动化，可以对接第三方优选IP服务。
+- **如何设置**:
+    1.  在管理后台将 `随机IP` 设置为 `false`。
+    2.  在 `ADD.txt` 编辑框中，填入API的URL（例如 `https://api.example.com/get/ips`），每个URL占一行。也可以与普通IP地址混合使用。
 
 ## ⭐ Star 星星走起
 [![Stargazers over time](https://starchart.cc/cmliu/edgetunnel.svg?variant=adaptive)](https://starchart.cc/cmliu/edgetunnel)
