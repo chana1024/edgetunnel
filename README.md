@@ -118,11 +118,11 @@
 |--------|---------|-|-----|
 | ADMIN | `123456` |✅| 面板登录密码 |
 | KEY | `CMLiussss` |❌| 快速订阅密钥，访问`/CMLiussss`即可快读订阅。 |
-| HOST | `edt-pages.github.io` |❌| 强制固定伪装域名 |
+| HOST | `edt-pages.github.io` |❌| 强制固定伪装域名(支持多元素，使用`换行符`或`,`做间隔) |
 | UUID | `90cd4a77-141a-43c9-991b-08263cfe9c10` |❌| 强制固定UUID |
 | PATH | `/` |❌| 强制固定路径 |
 | PROXYIP | `proxyip.cmliussss.net:443` |❌| 更换默认内置PROXYIP |
-| URL | `https://blog.cmliussss.com` |❌| 主页反代伪装(乱设容易触发反诈，反代被墙的网站会加速域名被墙) |
+| URL | `https://cloudflare-error-page-3th.pages.dev` |❌| 主页反代伪装(乱设容易触发反诈，反代被墙的网站会加速域名被墙) |
 | GO2SOCKS5  | `blog.cmliussss.com`,`*.ip111.cn`,`*google.com` |❌| 设置`SOCKS5`或`HTTP`变量之后，可设置强制使用socks5访问名单(设置为`*`可作为全局代理) |
 
 ## 核心概念与订阅配置指南
@@ -216,3 +216,4 @@
 - [Mingyu](https://github.com/ymyuuu/workers-vless)
 - [Alexandre Kojève](https://t.me/Enkelte_notif/784)：stallTCP v1.3
 - [eooce](https://github.com/eooce/Cloudflare-proxy)
+- [Sukka](https://ip.skk.moe/)
